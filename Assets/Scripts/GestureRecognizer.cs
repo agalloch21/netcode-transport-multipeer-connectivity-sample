@@ -43,12 +43,12 @@ public class GestureRecognizer : MonoBehaviour
     float m_GestureDetectionInterval = 0.1f;
 
     [SerializeField]
-    [Tooltip("The image displayed when this gesture is performed.")]
-    Image m_Highlight;
-
-    [SerializeField]
     [Tooltip("The static gestures associated with this gestures handedness.")]
     StaticHandGesture[] m_StaticGestures;
+
+    [SerializeField]
+    [Tooltip("The image component that draws the highlighted gesture icon border.")]
+    Image m_Highlight;
 
     XRHandShape m_HandShape;
     XRHandPose m_HandPose;
@@ -57,7 +57,7 @@ public class GestureRecognizer : MonoBehaviour
     float m_TimeOfLastConditionCheck;
     float m_HoldStartTime;
     Color m_BackgroundDefaultColor;
-    Color m_BackgroundHiglightColor = new Color(0f, 0.627451f, 1f);
+    Color m_BackgroundHighlightColor = new Color(0f, 0.627451f, 1f);
 
     /// <summary>
     /// The hand tracking events component to subscribe to receive updated joint data to be used for gesture detection.
@@ -93,6 +93,15 @@ public class GestureRecognizer : MonoBehaviour
     {
         get => m_Background;
         set => m_Background = value;
+    }
+
+    /// <summary>
+    /// The image component that draws the highlight state drawn on top of the gesture icon background.
+    /// </summary>
+    public Image highlight
+    {
+        get => m_Highlight;
+        set => m_Highlight = value;
     }
 
     /// <summary>
@@ -132,37 +141,26 @@ public class GestureRecognizer : MonoBehaviour
     }
 
     /// <summary>
-    /// The image component that draws the highlight state visuals for gesture icons.
+    /// Sets any assigned highlight UI component as visible/hidden
     /// </summary>
-    public Image highlight
-    {
-        get => m_Highlight;
-        set => m_Highlight = value;
-    }
-
-    /// <summary>
-    ///  Show or hide any highlight-state related visual UI elements
-    /// </summary>
-    public bool highlighted
+    public bool highlightVisible
     {
         set
         {
-            if(m_Highlight != null)
+            if (m_Highlight)
                 m_Highlight.enabled = value;
         }
     }
 
     void Awake()
     {
-        if(m_Background != null)
+        if (m_Background != null)
             m_BackgroundDefaultColor = m_Background.color;
-    }
 
-    void Start()
-    {
-        foreach (var gesture in m_StaticGestures)
+        if (m_Highlight)
         {
-            gesture.highlighted = false;
+            m_Highlight.enabled = false;
+            m_Highlight.gameObject.SetActive(true);
         }
     }
 
@@ -196,7 +194,7 @@ public class GestureRecognizer : MonoBehaviour
         {
             m_PerformedTriggered = false;
             m_GestureEnded?.Invoke();
-            if(m_Background != null)
+            if (m_Background != null)
                 m_Background.color = m_BackgroundDefaultColor;
         }
 
@@ -209,15 +207,16 @@ public class GestureRecognizer : MonoBehaviour
             {
                 m_GesturePerformed?.Invoke();
                 m_PerformedTriggered = true;
-                if(m_Background != null)
-                    m_Background.color = m_BackgroundHiglightColor;
-                if(m_Highlight != null)
+                if (m_Background != null)
+                    m_Background.color = m_BackgroundHighlightColor;
+
+                if (m_Highlight)
                     m_Highlight.enabled = true;
 
                 foreach (var gesture in m_StaticGestures)
                 {
                     if (gesture != this)
-                        gesture.highlighted = false;
+                        gesture.highlightVisible = false;
                 }
             }
         }
@@ -225,3 +224,4 @@ public class GestureRecognizer : MonoBehaviour
         m_TimeOfLastConditionCheck = Time.timeSinceLevelLoad;
     }
 }
+

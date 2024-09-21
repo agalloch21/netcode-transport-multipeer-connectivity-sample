@@ -27,10 +27,14 @@ public class PinchTrigger : MonoBehaviour
                 {
                     SpatialPointerState touchData = EnhancedSpatialPointerSupport.GetPointerState(touch);
 
-                    // https://docs.unity3d.com/Packages/com.unity.polyspatial.visionos@1.0/manual/PolySpatialInput.html
-                    // onPinch?.Invoke(touchData.interactionPosition);
-                    onPinch?.Invoke(touchData.inputDevicePosition); 
-                    break;
+                    // https://docs.unity3d.com/Packages/com.unity.polyspatial.visionos@0.5/manual/PolySpatialInput.html
+                    //if (touchData.Kind == SpatialPointerKind.DirectPinch)
+                    {
+                        // https://docs.unity3d.com/Packages/com.unity.polyspatial.visionos@1.0/manual/PolySpatialInput.html
+                        // onPinch?.Invoke(touchData.interactionPosition);
+                        onPinch?.Invoke(touchData.inputDevicePosition);
+                        break;
+                    }
                 }
             }
         }
